@@ -1,9 +1,9 @@
 {
-	"serverPort" : 5000,
-	"name":"gymshop",
+	"serverPort" : 7000,
+	"name":"shop",
 	"user":"postgres",
 	"host":"localhost",
-	"password":"inforoot95",
+	"password":"root23",
 	"port":"5432",
 	"secretKey":"user_store_pass79"
  }

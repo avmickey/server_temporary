@@ -3,7 +3,7 @@ require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const config = require('config');
-const PORT = config.get('serverPort') || 5000;
+const PORT = config.get('serverPort') || 7000;
 const cors = require('cors');
 const sequelize = require('./bd');
 const mapping = require('./models/mapping');
@@ -15,8 +15,14 @@ const path = require('path');
 const app = express();
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'https://avmickey.github.io/myapp/'],
+    origin: [
+      'http://localhost:3000',
+      'http://aner3mg1.beget.tech',
+      'https://avmickey.github.io/myapp/',
+    ],
+    methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
     credentials: true,
+    optionsSuccessStatus: 200,
   })
 );
 app.use(express.json());
