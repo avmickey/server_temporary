@@ -1,4 +1,4 @@
-const { Basket, BasketDevice, Device } = require('./mapping.js');
+const { Basket, BasketDevice, Device, Brand } = require('./mapping.js');
 const APIError = require('../errors/APIError.js');
 
 const pretty = (basket) => {
@@ -141,7 +141,7 @@ class BasketModel {
       include: [{ model: Device, as: 'devices' }],
     });
     if (!basket) {
-      throw new Error('Корзина не найдена в БД');
+      throw new Error('Cart not found in database');
     }
     await basket.destroy();
     return pretty(basket);

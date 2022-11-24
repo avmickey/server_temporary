@@ -20,6 +20,14 @@ const BasketDevice = sequelize.define('basketDevice', {
   quantity: { type: DataTypes.INTEGER, defaultValue: 1 },
 });
 
+const Favorite = sequelize.define('favorite', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+});
+
+const FavoriteDevice = sequelize.define('favoriteDevice', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+});
+
 const Device = sequelize.define('device', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING, allowNull: false, unique: true },
@@ -55,6 +63,20 @@ BasketDevice.belongsTo(Basket);
 Device.hasMany(BasketDevice);
 BasketDevice.belongsTo(Device);
 
+Favorite.belongsToMany(Device, {
+  through: FavoriteDevice,
+  onDelete: 'CASCADE',
+});
+Device.belongsToMany(Favorite, {
+  through: FavoriteDevice,
+  onDelete: 'CASCADE',
+});
+
+Favorite.hasMany(FavoriteDevice);
+FavoriteDevice.belongsTo(Favorite);
+Device.hasMany(FavoriteDevice);
+FavoriteDevice.belongsTo(Device);
+
 Type.hasMany(Device);
 Device.belongsTo(Type);
 
@@ -76,4 +98,6 @@ module.exports = {
   Basket,
   BasketDevice,
   Type,
+  Favorite,
+  FavoriteDevice,
 };

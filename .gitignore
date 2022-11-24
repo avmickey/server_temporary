@@ -8,8 +8,7 @@
 # testing
 /coverage
 
-# production
-/build
+dop.js
 
 # misc
 .DS_Store

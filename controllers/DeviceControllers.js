@@ -117,7 +117,7 @@ class DeviceControllers {
         throw new Error('Товар не найден в БД');
       }
       await device.destroy();
-      return device;
+      return res.json(device);
     } catch (error) {
       return next(APIError.badRequest(error.message));
     }
