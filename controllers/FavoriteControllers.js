@@ -8,12 +8,12 @@ class FAvoriteControllers {
   async getOne(req, res, next) {
     try {
       let favorite;
-      if (req.signedCookies.favoriteId) {
+      if (req.signedCookies.userId) {
         favorite = await FavoriteModel.getOne(
-          parseInt(req.signedCookies.favoriteId)
+          parseInt(req.signedCookies.userId)
         );
       } else {
-        favorite = await FavoriteModel.create();
+        return next(APIError.badRequest('not found cookies'));
       }
       res.cookie('favoriteId', favorite.id, { maxAge, signed });
       res.json(favorite);
@@ -24,15 +24,14 @@ class FAvoriteControllers {
   // !==================================================================================================
   async append(req, res, next) {
     try {
-      let favoriteId;
-      if (!req.signedCookies.favoriteId) {
-        let created = await FavoriteModel.create();
-        favoriteId = created.id;
+      let userId;
+      if (req.signedCookies.userId) {
+        userId = parseInt(req.signedCookies.userId);
       } else {
-        favoriteId = parseInt(req.signedCookies.favoriteId);
+        return next(APIError.badRequest('not found cookies'));
       }
       const { productId } = req.params;
-      const favorite = await FavoriteModel.append(favoriteId, productId);
+      const favorite = await FavoriteModel.append(userId, productId);
       res.cookie('favoriteId', favorite.id, { maxAge, signed });
       res.json(favorite);
     } catch (e) {
@@ -43,14 +42,13 @@ class FAvoriteControllers {
   // !==================================================================================================
   async clear(req, res, next) {
     try {
-      let favoriteId;
-      if (!req.signedCookies.favoriteId) {
-        let created = await BasketModel.create();
-        favoriteId = created.id;
+      let userId;
+      if (req.signedCookies.userId) {
+        userId = parseInt(req.signedCookies.userId);
       } else {
-        favoriteId = parseInt(req.signedCookies.favoriteId);
+        return next(APIError.badRequest('not found cookies'));
       }
-      const favorite = await BasketModel.clear(favoriteId);
+      const favorite = await BasketModel.clear(userId);
       res.cookie('favoriteId', favorite.id, { maxAge, signed });
       res.json(favorite);
     } catch (e) {

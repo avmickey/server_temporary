@@ -20,46 +20,54 @@ const pretty = (favorite) => {
 };
 
 class FavoriteModel {
-  async getOne(favoriteId) {
-    let favorite = await Favorite.findByPk(favoriteId, {
-      attributes: ['id'],
-      include: [{ model: Device, attributes: ['id', 'name', 'price', 'img'] }],
-    });
-    if (!favorite) {
-      favorite = await Favorite.create();
-    }
-    return pretty(favorite);
-  }
-  // !==================================================================================================
-  async create() {
-    const favorite = await Favorite.create();
-    return pretty(favorite);
-  }
-  // !==================================================================================================
-  async append(favoriteId, deviceId) {
-    let favorite = await Favorite.findByPk(favoriteId, {
+  async getOne(userId) {
+    const favoriteId = await Favorite.findOne({ where: { userId } });
+    let favorite = await Favorite.findByPk(favoriteId.id, {
       attributes: ['id'],
       include: [{ model: Device, attributes: ['id', 'name', 'price', 'img'] }],
     });
 
     if (!favorite) {
-      favorite = await Favorite.create();
+      favorite = await Favorite.create(userId);
+    }
+    return pretty(favorite);
+  }
+  // !==================================================================================================
+  async create(userId) {
+    const favorite = await Favorite.create({ userId });
+    return pretty(favorite);
+  }
+  // !==================================================================================================
+  async append(userId, deviceId) {
+    const favoriteId = await Favorite.findOne({ where: { userId } });
+    let favorite = await Favorite.findByPk(favoriteId.id, {
+      attributes: ['id'],
+      include: [{ model: Device, attributes: ['id', 'name', 'price', 'img'] }],
+    });
+    console.log(2);
+    if (!favorite) {
+      favorite = await Favorite.create(userId);
     }
     const favoriteDevice = await FavoriteDevice.findOne({
-      where: { favoriteId, deviceId },
+      where: { favoriteId: favoriteId.id, deviceId },
     });
+    console.log(1);
+    console.log(favoriteDevice);
     if (favoriteDevice) {
-      await FavoriteDevice.destroy({ where: { favoriteId, deviceId } });
+      await FavoriteDevice.destroy({
+        where: { favoriteId: favoriteId.id, deviceId },
+      });
     } else {
-      await FavoriteDevice.create({ favoriteId, deviceId });
+      await FavoriteDevice.create({ favoriteId: favoriteId.id, deviceId });
     }
     await favorite.reload();
     return pretty(favorite);
   }
 
   // !==================================================================================================
-  async delete(favoriteId) {
-    const favorite = await Favorite.findByPk(favoriteId, {
+  async delete(userId) {
+    const favoriteId = await Favorite.findOne({ where: { userId } });
+    const favorite = await Favorite.findByPk(favoriteId.id, {
       include: [{ model: Device, as: 'devices' }],
     });
     if (!favorite) {

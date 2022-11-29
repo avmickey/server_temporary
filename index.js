@@ -23,8 +23,15 @@ app.use(
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
     credentials: true,
     optionsSuccessStatus: 200,
+    allowedHeaders: [
+      'Accept-Version',
+      'Authorization',
+      'Credentials',
+      'Content-Type',
+    ],
   })
 );
+
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname, 'static')));
 app.use(fileUpload({}));

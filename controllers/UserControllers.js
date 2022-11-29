@@ -1,8 +1,10 @@
-const { User, Basket } = require('../models/mapping');
+const { User, Basket, Favorite } = require('../models/mapping');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const config = require('config');
 const APIError = require('../errors/APIError');
+const maxAge = 60 * 60 * 1000 * 24 * 365; // один год
+const signed = true;
 
 const generateJwt = (id, email, role, login) => {
   return jwt.sign({ id, email, role, login }, config.get('secretKey'), {
@@ -15,7 +17,6 @@ class UserControllers {
     try {
       const { email, password, number, login, role, firstName, lastName } =
         req.body;
-      console.log(req.body);
       if (!email || !password) {
         return next(APIError.badRequest('Email not specified'));
       }
@@ -45,8 +46,12 @@ class UserControllers {
       const basket = await Basket.create({
         userId: user.id,
       });
+      const favorite = await Favorite.create({
+        userId: user.id,
+      });
       const token = generateJwt(user.id, user.email, user.role, user.login);
-      return res.json({ message: 'Ok', token });
+      res.cookie('userId', user.id, { maxAge, signed });
+      res.json({ message: 'Ok', token, user });
     } catch (e) {
       return next(APIError.badRequest(e.message));
     }
@@ -70,7 +75,8 @@ class UserControllers {
         return next(APIError.badRequest('Invalid password'));
       }
       const token = generateJwt(user.id, user.email, user.role, user.login);
-      return res.json({ message: 'Ok', token });
+      res.cookie('userId', user.id, { maxAge, signed });
+      res.json({ message: 'Ok', token, user });
     } catch (e) {
       return next(APIError.badRequest(e.message));
     }
@@ -93,7 +99,12 @@ class UserControllers {
       req.user.login
     );
     const user = await User.findOne({ where: { login: req.user.login } });
-    return res.json({ token, user });
+    if (user) {
+      res.cookie('userId', user.id, { maxAge, signed });
+      res.json({ token, user });
+    } else {
+      return res.status(405).json({ message: 'Не авторизован' });
+    }
   }
 }
 

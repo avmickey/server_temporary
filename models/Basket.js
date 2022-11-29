@@ -20,76 +20,82 @@ const pretty = (basket) => {
 };
 
 class BasketModel {
-  async getOne(basketId) {
-    let basket = await Basket.findByPk(basketId, {
-      attributes: ['id'],
-      include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
-    });
-    if (!basket) {
-      basket = await Basket.create();
-    }
-    return pretty(basket);
-  }
-  // !==================================================================================================
-  async create() {
-    const basket = await Basket.create();
-    return pretty(basket);
-  }
-  // !==================================================================================================
-  async append(basketId, deviceId, quantity) {
-    let basket = await Basket.findByPk(basketId, {
+  async getOne(userId) {
+    const basketId = await Basket.findOne({ where: { userId } });
+    let basket = await Basket.findByPk(basketId.id, {
       attributes: ['id'],
       include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
     });
 
     if (!basket) {
-      basket = await Basket.create();
+      basket = await Basket.create({ userId });
     }
-    // проверяем, есть ли уже этот товар в корзине
+
+    return pretty(basket);
+  }
+  // !==================================================================================================
+  async create(id) {
+    const basket = await Basket.create({ userId: id });
+    return pretty(basket);
+  }
+  // !==================================================================================================
+  async append(userId, deviceId, quantity) {
+    const basketId = await Basket.findOne({ where: { userId } });
+    let basket = await Basket.findByPk(basketId.id, {
+      attributes: ['id'],
+      include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
+    });
+    if (!basket) {
+      basket = await Basket.create({ userId });
+    }
+
     const basketDevice = await BasketDevice.findOne({
-      where: { basketId, deviceId },
+      where: { basketId: basketId.id, deviceId },
     });
     if (basketDevice) {
-      // есть в корзине
       await basketDevice.increment('quantity', { by: quantity });
     } else {
-      // нет в корзине
-      await BasketDevice.create({ basketId, deviceId, quantity });
+      await BasketDevice.create({ basketId: basketId.id, deviceId, quantity });
     }
-    // обновим объект корзины, чтобы вернуть свежие данные
+
     await basket.reload();
     return pretty(basket);
   }
   // !==================================================================================================
-  async increment(basketId, deviceId, quantity) {
-    let basket = await Basket.findByPk(basketId, {
-      include: [{ model: Device, as: 'devices' }],
+  async increment(userId, deviceId, quantity) {
+    const basketId = await Basket.findOne({ where: { userId } });
+    let basket = await Basket.findByPk(basketId.id, {
+      attributes: ['id'],
+      include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
     });
+
     if (!basket) {
-      basket = await Basket.create();
+      basket = await Basket.create({ userId });
     }
-    // проверяем, есть ли этот товар в корзине
+
     const basketDevice = await BasketDevice.findOne({
-      where: { basketId, deviceId },
+      where: { basketId: basketId.id, deviceId },
     });
     if (basketDevice) {
       await basketDevice.increment('quantity', { by: quantity });
-      // обновим объект корзины, чтобы вернуть свежие данные
+
       await basket.reload();
     }
     return pretty(basket);
   }
   // !==================================================================================================
-  async decrement(basketId, deviceId, quantity) {
-    let basket = await Basket.findByPk(basketId, {
-      include: [{ model: Device, as: 'devices' }],
+  async decrement(userId, deviceId, quantity) {
+    const basketId = await Basket.findOne({ where: { userId } });
+    let basket = await Basket.findByPk(basketId.id, {
+      attributes: ['id'],
+      include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
     });
     if (!basket) {
-      basket = await Basket.create();
+      basket = await Basket.create({ userId });
     }
-    // проверяем, есть ли этот товар в корзине
+
     const basketDevice = await BasketDevice.findOne({
-      where: { basketId, deviceId },
+      where: { basketId: basket.id, deviceId },
     });
     if (basketDevice) {
       if (basketDevice.quantity > quantity) {
@@ -97,47 +103,49 @@ class BasketModel {
       } else {
         await basketDevice.destroy();
       }
-      // обновим объект корзины, чтобы вернуть свежие данные
       await basket.reload();
     }
     return pretty(basket);
   }
   // !==================================================================================================
-  async remove(basketId, deviceId) {
-    let basket = await Basket.findByPk(basketId, {
+  async remove(userId, deviceId) {
+    const basketId = await Basket.findOne({ where: { userId } });
+    let basket = await Basket.findByPk(basketId.id, {
       include: [{ model: Device, as: 'devices' }],
     });
     if (!basket) {
-      basket = await Basket.create();
+      basket = await Basket.create({ userId });
     }
     // проверяем, есть ли этот товар в корзине
     const basketDevice = await BasketDevice.findOne({
-      where: { basketId, deviceId },
+      where: { basketId: basket.id, deviceId },
     });
     if (basketDevice) {
       await basketDevice.destroy();
-      // обновим объект корзины, чтобы вернуть свежие данные
+
       await basket.reload();
     }
     return pretty(basket);
   }
   // !==================================================================================================
-  async clear(basketId) {
-    let basket = await Basket.findByPk(basketId, {
+  async clear(userId) {
+    const basketId = await Basket.findOne({ where: { userId } });
+    let basket = await Basket.findByPk(basketId.id, {
       include: [{ model: Device, as: 'devices' }],
     });
     if (basket) {
-      await BasketDevice.destroy({ where: { basketId } });
-      // обновим объект корзины, чтобы вернуть свежие данные
+      await BasketDevice.destroy({ where: { basketId: basketId.id } });
+
       await basket.reload();
     } else {
-      basket = await Basket.create();
+      basket = await Basket.create({ userId });
     }
     return pretty(basket);
   }
   // !==================================================================================================
-  async delete(basketId) {
-    const basket = await Basket.findByPk(basketId, {
+  async delete(userId) {
+    const basketId = await Basket.findOne({ where: { userId } });
+    let basket = await Basket.findByPk(basketId.id, {
       include: [{ model: Device, as: 'devices' }],
     });
     if (!basket) {

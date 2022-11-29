@@ -6,15 +6,13 @@ const path = require('path');
 class DeviceControllers {
   async getAll(req, res, next) {
     try {
-      let { brandId, typeId, limit, page } = req.query;
-      page = page || 1;
-      limit = limit || 10;
-      let offset = page * limit - limit;
+      let { brandId, typeId } = req.query;
+      // page = page || 1;
+      // limit = limit || 10;
+      // let offset = page * limit - limit;
       let device;
       if (!brandId && !typeId) {
         device = await Device.findAndCountAll({
-          limit,
-          offset,
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
@@ -24,8 +22,6 @@ class DeviceControllers {
       if (brandId && !typeId) {
         device = await Device.findAndCountAll({
           where: { brandId },
-          limit,
-          offset,
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
@@ -35,8 +31,6 @@ class DeviceControllers {
       if (!brandId && typeId) {
         device = await Device.findAndCountAll({
           where: { typeId },
-          limit,
-          offset,
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
@@ -46,8 +40,6 @@ class DeviceControllers {
       if (brandId && typeId) {
         device = await Device.findAndCountAll({
           where: { typeId, brandId },
-          limit,
-          offset,
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
@@ -108,7 +100,7 @@ class DeviceControllers {
 
   async delete(req, res, next) {
     try {
-      const id = req.params.id;
+      const { id } = req.params;
       if (!id) {
         throw new Error('Не указан id пользователя');
       }

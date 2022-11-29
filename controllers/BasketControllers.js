@@ -8,10 +8,10 @@ class BasketControllers {
   async getOne(req, res, next) {
     try {
       let basket;
-      if (req.signedCookies.basketId) {
-        basket = await BasketModel.getOne(parseInt(req.signedCookies.basketId));
+      if (req.signedCookies.userId) {
+        basket = await BasketModel.getOne(parseInt(req.signedCookies.userId));
       } else {
-        basket = await BasketModel.create();
+        return next(APIError.badRequest('not found cookies'));
       }
       res.cookie('basketId', basket.id, { maxAge, signed });
       res.json(basket);
@@ -22,15 +22,15 @@ class BasketControllers {
   // !==================================================================================================
   async append(req, res, next) {
     try {
-      let basketId;
-      if (!req.signedCookies.basketId) {
-        let created = await BasketModel.create();
-        basketId = created.id;
+      let userId;
+      if (req.signedCookies.userId) {
+        userId = parseInt(req.signedCookies.userId);
       } else {
-        basketId = parseInt(req.signedCookies.basketId);
+        return next(APIError.badRequest('not found cookies'));
       }
       const { productId, quantity } = req.params;
-      const basket = await BasketModel.append(basketId, productId, quantity);
+      const basket = await BasketModel.append(userId, productId, quantity);
+      console.log(basket);
       res.cookie('basketId', basket.id, { maxAge, signed });
       res.json(basket);
     } catch (e) {
@@ -40,15 +40,14 @@ class BasketControllers {
   // !==================================================================================================
   async increment(req, res, next) {
     try {
-      let basketId;
-      if (!req.signedCookies.basketId) {
-        let created = await BasketModel.create();
-        basketId = created.id;
+      let userId;
+      if (req.signedCookies.userId) {
+        userId = parseInt(req.signedCookies.userId);
       } else {
-        basketId = parseInt(req.signedCookies.basketId);
+        return next(APIError.badRequest('not found cookies'));
       }
       const { productId, quantity } = req.params;
-      const basket = await BasketModel.increment(basketId, productId, quantity);
+      const basket = await BasketModel.increment(userId, productId, quantity);
       res.cookie('basketId', basket.id, { maxAge, signed });
       res.json(basket);
     } catch (e) {
@@ -58,15 +57,14 @@ class BasketControllers {
   // !==================================================================================================
   async decrement(req, res, next) {
     try {
-      let basketId;
-      if (!req.signedCookies.basketId) {
-        let created = await BasketModel.create();
-        basketId = created.id;
+      let userId;
+      if (req.signedCookies.userId) {
+        userId = parseInt(req.signedCookies.userId);
       } else {
-        basketId = parseInt(req.signedCookies.basketId);
+        return next(APIError.badRequest('not found cookies'));
       }
       const { productId, quantity } = req.params;
-      const basket = await BasketModel.decrement(basketId, productId, quantity);
+      const basket = await BasketModel.decrement(userId, productId, quantity);
       res.cookie('basketId', basket.id, { maxAge, signed });
       res.json(basket);
     } catch (e) {
@@ -76,14 +74,13 @@ class BasketControllers {
   // !==================================================================================================
   async remove(req, res, next) {
     try {
-      let basketId;
-      if (!req.signedCookies.basketId) {
-        let created = await BasketModel.create();
-        basketId = created.id;
+      let userId;
+      if (req.signedCookies.userId) {
+        userId = parseInt(req.signedCookies.userId);
       } else {
-        basketId = parseInt(req.signedCookies.basketId);
+        return next(APIError.badRequest('not found cookies'));
       }
-      const basket = await BasketModel.remove(basketId, req.params.productId);
+      const basket = await BasketModel.remove(userId, req.params.productId);
       res.cookie('basketId', basket.id, { maxAge, signed });
       res.json(basket);
     } catch (e) {
@@ -93,14 +90,13 @@ class BasketControllers {
   // !==================================================================================================
   async clear(req, res, next) {
     try {
-      let basketId;
-      if (!req.signedCookies.basketId) {
-        let created = await BasketModel.create();
-        basketId = created.id;
+      let userId;
+      if (req.signedCookies.userId) {
+        userId = parseInt(req.signedCookies.userId);
       } else {
-        basketId = parseInt(req.signedCookies.basketId);
+        return next(APIError.badRequest('not found cookies'));
       }
-      const basket = await BasketModel.clear(basketId);
+      const basket = await BasketModel.clear(userId);
       res.cookie('basketId', basket.id, { maxAge, signed });
       res.json(basket);
     } catch (e) {
