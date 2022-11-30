@@ -1,6 +1,15 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../bd');
 
+const UserFiles = sequelize.define('user', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  email: { type: DataTypes.STRING, unique: true },
+  password: { type: DataTypes.STRING },
+  number: { type: DataTypes.STRING, unique: true },
+  login: { type: DataTypes.STRING, unique: true },
+  role: { type: DataTypes.STRING, defaultValue: 'USER' },
+});
+
 const User = sequelize.define('user', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   firstName: { type: DataTypes.STRING, allowNull: false },
@@ -98,6 +107,7 @@ Brand.belongsToMany(Type, { through: TypeBrand });
 
 module.exports = {
   User,
+  UserFiles,
   Device,
   TypeBrand,
   Brand,

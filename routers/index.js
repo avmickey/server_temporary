@@ -7,6 +7,7 @@ const Type = require('./typeRouter');
 const UserCheck = require('./userCheck');
 const Basket = require('./basketRouter');
 const Favorite = require('./favoriteRouter');
+const UserFile = require('./userFileRouter');
 
 router.use('/user', User);
 router.use('/device', Device);
@@ -15,5 +16,6 @@ router.use('/type', Type);
 router.use('/usercheck', UserCheck);
 router.use('/basket', Basket);
 router.use('/favorite', Favorite);
+router.use('/userfile', UserFile);
 
 module.exports = router;

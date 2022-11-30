@@ -82,10 +82,10 @@ class UserControllers {
     }
   }
 
-  async delete(id) {
-    const user = await User.findByPk(id);
+  async delete(req, res, next) {
+    const user = await User.findByPk(req.user.id);
     if (!user) {
-      throw new Error('Пользователь не найден');
+      throw new Error('User is not found');
     }
     await user.destroy();
     return user;
