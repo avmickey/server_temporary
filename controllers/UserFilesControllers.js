@@ -1,11 +1,12 @@
-const { User } = require('../models/mapping');
+const { UserFiles } = require('../models/mapping');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const config = require('config');
 const bcrypt = require('bcrypt');
 const APIError = require('../errors/APIError');
 
-const generateJwt = (id, email, role, number, login) => {
-  return jwt.sign({ id, email, role, number, login }, process.env.SECRET_KEY, {
+const generateJwt = (id, email, role, login) => {
+  return jwt.sign({ id, email, role, login }, config.get('secretKey'), {
     expiresIn: '24h',
   });
 };
@@ -17,35 +18,29 @@ class UserFilesControllers {
       if (!email || !password) {
         return next(APIError.badRequest('Не указан email'));
       }
-      const candidata = await User.findOne({ where: { email } });
+      const candidata = await UserFiles.findOne({ where: { email } });
       if (candidata) {
         return next(APIError.badRequest('Данный email уже существует'));
       }
-      const userNumber = await User.findOne({ where: { number } });
+      const userNumber = await UserFiles.findOne({ where: { number } });
       if (userNumber) {
         return next(APIError.badRequest('Данный номер уже существует'));
       }
-      const userLogin = await User.findOne({ where: { login } });
+      const userLogin = await UserFiles.findOne({ where: { login } });
       if (userLogin) {
         return next(APIError.badRequest('Данный логин уже существует'));
       }
 
       const hashPass = await bcrypt.hash(password, 5);
-      const user = await User.create({
+      const user = await UserFiles.create({
         password: hashPass,
         email,
         role,
         number,
         login,
       });
-      const token = generateJwt(
-        user.id,
-        user.email,
-        user.role,
-        user.number,
-        user.login
-      );
-      return res.json({ message: 'Ok', token });
+      const token = generateJwt(user.id, user.email, user.role, user.login);
+      return res.json({ message: 'Ok', token, user });
     } catch (e) {
       return next(APIError.badRequest(e.message));
     }
@@ -54,8 +49,8 @@ class UserFilesControllers {
   async login(req, res, next) {
     try {
       const { email, password } = req.body;
-      let user = await User.findOne({ where: { email } });
-      const number = await User.findOne({
+      let user = await UserFiles.findOne({ where: { email } });
+      const number = await UserFiles.findOne({
         where: { number: email },
       });
 
@@ -68,27 +63,21 @@ class UserFilesControllers {
       if (!comparePass) {
         return next(APIError.badRequest('неверный пароль'));
       }
-      const token = generateJwt(
-        user.id,
-        user.email,
-        user.role,
-        user.number,
-        user.login
-      );
-      return res.json({ message: 'Ok', token });
+      const token = generateJwt(user.id, user.email, user.role, user.login);
+      return res.json({ message: 'Ok', token, user });
     } catch (e) {
       return next(APIError.badRequest(e.message));
     }
   }
   async check(req, res, next) {
-    const token = generateJwt(
-      req.user.id,
-      req.user.email,
-      req.user.role,
-      req.user.number,
-      req.user.login
-    );
-    return res.json({ token });
+    const token = generateJwt(user.id, user.email, user.role, user.login);
+    const user = await UserFiles.findOne({ where: { login: req.user.login } });
+    if (user) {
+      res.cookie('userId', user.id, { maxAge, signed });
+      res.json({ token, user });
+    } else {
+      return res.status(405).json({ message: 'Не авторизован' });
+    }
   }
 }
 
