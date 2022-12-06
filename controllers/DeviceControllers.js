@@ -1,34 +1,41 @@
 const APIError = require('../errors/APIError');
-const { Device, DeviceInfo, Brand, Type } = require('../models/mapping');
+const { Device, DeviceInfo, Brand, Type, Color } = require('../models/mapping');
 const uuid = require('uuid');
 const path = require('path');
 
 class DeviceControllers {
-  async getAll(req, res, next) {
+  async getAllBrandOrType(req, res, next) {
     try {
-      let { brandId, typeId } = req.query;
+      let { brandId, typeId, colorId } = req.body;
+      const brand = JSON.parse(brandId || '[]');
+      const arr = brand.length != 0;
+      const color = JSON.parse(colorId || '[]');
+      const arrColor = color.length != 0;
+
       // page = page || 1;
       // limit = limit || 10;
       // let offset = page * limit - limit;
       let device;
-      if (!brandId && !typeId) {
+
+      if (arr && !typeId && !arrColor) {
         device = await Device.findAndCountAll({
+          where: { brandId: [...brand] },
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
           ],
         });
       }
-      if (brandId && !typeId) {
+      if (arr && !typeId && arrColor) {
         device = await Device.findAndCountAll({
-          where: { brandId },
+          where: { brandId: [...brand], colorId: [...color] },
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
           ],
         });
       }
-      if (!brandId && typeId) {
+      if (!arr && typeId && !arrColor) {
         device = await Device.findAndCountAll({
           where: { typeId },
           include: [
@@ -37,9 +44,27 @@ class DeviceControllers {
           ],
         });
       }
-      if (brandId && typeId) {
+      if (!arr && typeId && arrColor) {
         device = await Device.findAndCountAll({
-          where: { typeId, brandId },
+          where: { typeId, colorId: [...color] },
+          include: [
+            { model: Brand, as: 'brand' },
+            { model: Type, as: 'type' },
+          ],
+        });
+      }
+      if (arr && typeId && !arrColor) {
+        device = await Device.findAndCountAll({
+          where: { typeId, brandId: [...brand] },
+          include: [
+            { model: Brand, as: 'brand' },
+            { model: Type, as: 'type' },
+          ],
+        });
+      }
+      if (arr && typeId && arrColor) {
+        device = await Device.findAndCountAll({
+          where: { typeId, brandId: [...brand], colorId: [...color] },
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
@@ -51,10 +76,25 @@ class DeviceControllers {
       return next(APIError.badRequest(error.message));
     }
   }
+
+  async getAll(req, res, next) {
+    try {
+      const device = await Device.findAndCountAll({
+        include: [
+          { model: Brand, as: 'brand' },
+          { model: Type, as: 'type' },
+        ],
+      });
+
+      return res.json(device);
+    } catch (error) {
+      return next(APIError.badRequest(error.message));
+    }
+  }
+
   async set(req, res, next) {
     try {
-      let { name, price, brandId, typeId, info } = req.body;
-      console.log(req.body);
+      let { name, price, brandId, typeId, colorId, info } = req.body;
       const { img } = req.files;
       const filename = uuid.v4() + '.png';
       img.mv(path.resolve(__dirname, '..', 'static', filename));
@@ -62,6 +102,7 @@ class DeviceControllers {
         name,
         price,
         brandId,
+        colorId,
         typeId,
         img: filename,
       });

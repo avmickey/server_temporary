@@ -15,14 +15,8 @@ const path = require('path');
 const app = express();
 app.use(
   cors({
-    origin: [
-      'http://localhost:3000',
-      'http://aner3mg1.beget.tech',
-      'https://avmickey.github.io/myapp',
-    ],
+    origin: [],
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
-    credentials: true,
-    optionsSuccessStatus: 200,
     allowedHeaders: [
       'Accept-Version',
       'Authorization',

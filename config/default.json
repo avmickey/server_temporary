@@ -1,9 +1,9 @@
 {
 	"serverPort" : 5000,
-	"name":"shop",
+	"name":"db_storage",
 	"user":"postgres",
 	"host":"localhost",
-	"password":"root23",
+	"password":"onforoot95",
 	"port":"5432",
 	"secretKey":"user_store_pass79"
  }

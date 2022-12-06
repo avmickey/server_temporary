@@ -61,6 +61,11 @@ const Brand = sequelize.define('brand', {
   name: { type: DataTypes.STRING, allowNull: false, unique: true },
 });
 
+const Color = sequelize.define('color', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING, allowNull: false, unique: true },
+});
+
 const TypeBrand = sequelize.define('typeBrand', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 });
@@ -99,11 +104,20 @@ Device.belongsTo(Type);
 Brand.hasMany(Device);
 Device.belongsTo(Brand);
 
+Color.hasMany(Device);
+Device.belongsTo(Color);
+
 Device.hasMany(DeviceInfo, { as: 'info' });
 DeviceInfo.belongsTo(Device);
 
 Type.belongsToMany(Brand, { through: TypeBrand });
 Brand.belongsToMany(Type, { through: TypeBrand });
+
+Color.belongsToMany(Brand, { through: TypeBrand });
+Brand.belongsToMany(Color, { through: TypeBrand });
+
+Type.belongsToMany(Color, { through: TypeBrand });
+Color.belongsToMany(Type, { through: TypeBrand });
 
 module.exports = {
   User,
@@ -117,4 +131,5 @@ module.exports = {
   Type,
   Favorite,
   FavoriteDevice,
+  Color,
 };

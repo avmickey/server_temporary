@@ -1,27 +1,27 @@
 const APIError = require('../errors/APIError');
-const { Brand } = require('../models/mapping');
+const { Color } = require('../models/mapping');
 
-class BrandConstrollers {
+class ColorControllers {
   async set(req, res, next) {
     try {
       const { name } = req.body;
       if (!name) {
         return next(APIError.badRequest('не задано поле name'));
       }
-      const brand = await Brand.create({ name });
-      return res.json(brand);
+      const color = await Color.create({ name });
+      return res.json(color);
     } catch (error) {
       return next(APIError.badRequest(error.message));
     }
   }
   async get(req, res, next) {
     try {
-      const brand = await Brand.findAll();
-      return res.json(brand);
+      const color = await Color.findAll();
+      return res.json(color);
     } catch (error) {
       return next(APIError.badRequest(error.message));
     }
   }
 }
 
-module.exports = new BrandConstrollers();
+module.exports = new ColorControllers();

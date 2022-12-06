@@ -8,6 +8,7 @@ const UserCheck = require('./userCheck');
 const Basket = require('./basketRouter');
 const Favorite = require('./favoriteRouter');
 const UserFile = require('./userFileRouter');
+const Color = require('./colorRouter');
 
 router.use('/user', User);
 router.use('/device', Device);
@@ -17,5 +18,6 @@ router.use('/usercheck', UserCheck);
 router.use('/basket', Basket);
 router.use('/favorite', Favorite);
 router.use('/userfile', UserFile);
+router.use('/color', Color);
 
 module.exports = router;

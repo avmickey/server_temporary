@@ -6,12 +6,12 @@ class TypeControllers {
     try {
       const { name } = req.body;
       if (!name) {
-        return next(APIError.bedRequest('не задано поле name'));
+        return next(APIError.badRequest('не задано поле name'));
       }
       const type = await Type.create({ name });
       return res.json(type);
     } catch (error) {
-      return next(APIError.bedRequest(error.message));
+      return next(APIError.badRequest(error.message));
     }
   }
   async get(req, res, next) {
@@ -19,7 +19,7 @@ class TypeControllers {
       const type = await Type.findAll();
       return res.json(type);
     } catch (error) {
-      return next(APIError.bedRequest(error.message));
+      return next(APIError.badRequest(error.message));
     }
   }
 }
