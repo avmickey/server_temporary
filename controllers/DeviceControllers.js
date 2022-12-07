@@ -11,10 +11,6 @@ class DeviceControllers {
       const arr = brand.length != 0;
       const color = JSON.parse(colorId || '[]');
       const arrColor = color.length != 0;
-
-      // page = page || 1;
-      // limit = limit || 10;
-      // let offset = page * limit - limit;
       let device;
 
       if (arr && !typeId && !arrColor) {

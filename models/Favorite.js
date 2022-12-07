@@ -1,4 +1,4 @@
-const { Device, Favorite, FavoriteDevice } = require('./mapping.js');
+const { Device, Favorite, Brand, FavoriteDevice } = require('./mapping.js');
 const APIError = require('../errors/APIError.js');
 
 const pretty = (favorite) => {
@@ -12,6 +12,18 @@ const pretty = (favorite) => {
         name: item.name,
         price: item.price,
         img: item.img,
+        brand: item.brand,
+      };
+    });
+  } else {
+    data.devices = favorite.favoriteDevices.map((item) => {
+      console.log(item);
+      return {
+        id: item.device.id,
+        name: item.device.name,
+        price: item.device.price,
+        img: item.device.img,
+        brand: item.device.brand,
       };
     });
   }
@@ -20,12 +32,41 @@ const pretty = (favorite) => {
 };
 
 class FavoriteModel {
-  async getOne(userId) {
+  async getOne(userId, req) {
+    const { _limit } = req.query;
     const favoriteId = await Favorite.findOne({ where: { userId } });
-    let favorite = await Favorite.findByPk(favoriteId.id, {
-      attributes: ['id'],
-      include: [{ model: Device, attributes: ['id', 'name', 'price', 'img'] }],
-    });
+    let favorite;
+    if (_limit) {
+      favorite = await Favorite.findByPk(favoriteId.id, {
+        attributes: ['id'],
+        include: [
+          {
+            model: FavoriteDevice,
+            attributes: ['id'],
+            separate: true,
+            limit: _limit,
+            include: [
+              {
+                model: Device,
+                attributes: ['id', 'name', 'price', 'img', 'brandId'],
+                include: [{ model: Brand, as: 'brand' }],
+              },
+            ],
+          },
+        ],
+      });
+    } else {
+      favorite = await Favorite.findByPk(favoriteId.id, {
+        attributes: ['id'],
+        include: [
+          {
+            model: Device,
+            attributes: ['id', 'name', 'price', 'img', 'brandId'],
+            include: [{ model: Brand, as: 'brand' }],
+          },
+        ],
+      });
+    }
 
     if (!favorite) {
       favorite = await Favorite.create(userId);
@@ -42,9 +83,14 @@ class FavoriteModel {
     const favoriteId = await Favorite.findOne({ where: { userId } });
     let favorite = await Favorite.findByPk(favoriteId.id, {
       attributes: ['id'],
-      include: [{ model: Device, attributes: ['id', 'name', 'price', 'img'] }],
+      include: [
+        {
+          model: Device,
+          attributes: ['id', 'name', 'price', 'img'],
+          include: [{ model: Brand, as: 'brand' }],
+        },
+      ],
     });
-    console.log(2);
     if (!favorite) {
       favorite = await Favorite.create(userId);
     }

@@ -46,7 +46,7 @@ class UserCheckControllers {
         return next(APIError.badRequest('Invalid password'));
       }
 
-      return res.json({ message: 'Ok' });
+      return res.json({ message: 'Ok', user: user });
     } catch (e) {
       return next(APIError.badRequest(e.message));
     }

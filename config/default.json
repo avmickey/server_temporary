@@ -3,7 +3,7 @@
 	"name":"db_storage",
 	"user":"postgres",
 	"host":"localhost",
-	"password":"onforoot95",
+	"password":"inforoot95",
 	"port":"5432",
 	"secretKey":"user_store_pass79"
  }

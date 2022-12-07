@@ -12,6 +12,7 @@ const pretty = (basket) => {
         name: item.name,
         price: item.price,
         quantity: item.basketDevice.quantity,
+        brand: item.brand,
       };
     });
   }
@@ -24,7 +25,13 @@ class BasketModel {
     const basketId = await Basket.findOne({ where: { userId } });
     let basket = await Basket.findByPk(basketId.id, {
       attributes: ['id'],
-      include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
+      include: [
+        {
+          model: Device,
+          attributes: ['id', 'name', 'price'],
+          include: [{ model: Brand, as: 'brand' }],
+        },
+      ],
     });
 
     if (!basket) {
@@ -43,7 +50,13 @@ class BasketModel {
     const basketId = await Basket.findOne({ where: { userId } });
     let basket = await Basket.findByPk(basketId.id, {
       attributes: ['id'],
-      include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
+      include: [
+        {
+          model: Device,
+          attributes: ['id', 'name', 'price'],
+          include: [{ model: Brand, as: 'brand' }],
+        },
+      ],
     });
     if (!basket) {
       basket = await Basket.create({ userId });
@@ -66,7 +79,13 @@ class BasketModel {
     const basketId = await Basket.findOne({ where: { userId } });
     let basket = await Basket.findByPk(basketId.id, {
       attributes: ['id'],
-      include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
+      include: [
+        {
+          model: Device,
+          attributes: ['id', 'name', 'price'],
+          include: [{ model: Brand, as: 'brand' }],
+        },
+      ],
     });
 
     if (!basket) {
@@ -88,7 +107,13 @@ class BasketModel {
     const basketId = await Basket.findOne({ where: { userId } });
     let basket = await Basket.findByPk(basketId.id, {
       attributes: ['id'],
-      include: [{ model: Device, attributes: ['id', 'name', 'price'] }],
+      include: [
+        {
+          model: Device,
+          attributes: ['id', 'name', 'price'],
+          include: [{ model: Brand, as: 'brand' }],
+        },
+      ],
     });
     if (!basket) {
       basket = await Basket.create({ userId });

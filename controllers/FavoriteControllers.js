@@ -10,7 +10,8 @@ class FAvoriteControllers {
       let favorite;
       if (req.signedCookies.userId) {
         favorite = await FavoriteModel.getOne(
-          parseInt(req.signedCookies.userId)
+          parseInt(req.signedCookies.userId),
+          req
         );
       } else {
         return next(APIError.badRequest('not found cookies'));
