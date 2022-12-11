@@ -45,6 +45,7 @@ class FavoriteModel {
             attributes: ['id'],
             separate: true,
             limit: _limit,
+
             include: [
               {
                 model: Device,
@@ -97,8 +98,6 @@ class FavoriteModel {
     const favoriteDevice = await FavoriteDevice.findOne({
       where: { favoriteId: favoriteId.id, deviceId },
     });
-    console.log(1);
-    console.log(favoriteDevice);
     if (favoriteDevice) {
       await FavoriteDevice.destroy({
         where: { favoriteId: favoriteId.id, deviceId },

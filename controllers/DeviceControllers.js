@@ -1,7 +1,11 @@
 const APIError = require('../errors/APIError');
-const { Device, DeviceInfo, Brand, Type, Color } = require('../models/mapping');
-const uuid = require('uuid');
-const path = require('path');
+const {
+  Device,
+  DeviceInfo,
+  Brand,
+  Type,
+  DeviceImg,
+} = require('../models/mapping');
 
 class DeviceControllers {
   async getAllBrandOrType(req, res, next) {
@@ -19,6 +23,10 @@ class DeviceControllers {
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
+            {
+              model: DeviceImg,
+              as: 'deviceimg',
+            },
           ],
         });
       }
@@ -28,6 +36,10 @@ class DeviceControllers {
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
+            {
+              model: DeviceImg,
+              as: 'deviceimg',
+            },
           ],
         });
       }
@@ -37,6 +49,10 @@ class DeviceControllers {
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
+            {
+              model: DeviceImg,
+              as: 'deviceimg',
+            },
           ],
         });
       }
@@ -46,6 +62,10 @@ class DeviceControllers {
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
+            {
+              model: DeviceImg,
+              as: 'deviceimg',
+            },
           ],
         });
       }
@@ -55,6 +75,10 @@ class DeviceControllers {
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
+            {
+              model: DeviceImg,
+              as: 'deviceimg',
+            },
           ],
         });
       }
@@ -64,6 +88,10 @@ class DeviceControllers {
           include: [
             { model: Brand, as: 'brand' },
             { model: Type, as: 'type' },
+            {
+              model: DeviceImg,
+              as: 'deviceimg',
+            },
           ],
         });
       }
@@ -79,6 +107,10 @@ class DeviceControllers {
         include: [
           { model: Brand, as: 'brand' },
           { model: Type, as: 'type' },
+          {
+            model: DeviceImg,
+            as: 'deviceimg',
+          },
         ],
       });
 
@@ -90,17 +122,15 @@ class DeviceControllers {
 
   async set(req, res, next) {
     try {
-      let { name, price, brandId, typeId, colorId, info } = req.body;
-      const { img } = req.files;
-      const filename = uuid.v4() + '.png';
-      img.mv(path.resolve(__dirname, '..', 'static', filename));
+      let { name, price, brandId, typeId, colorId, info, deviceimgId } =
+        req.body;
       const device = await Device.create({
         name,
         price,
         brandId,
         colorId,
         typeId,
-        img: filename,
+        deviceimgId,
       });
       if (info) {
         info = JSON.parse(info);
@@ -121,12 +151,17 @@ class DeviceControllers {
   async get(req, res, next) {
     try {
       const { id } = req.params;
+
       const device = await Device.findOne({
         where: { id },
         include: [
           { model: DeviceInfo, as: 'info' },
           { model: Brand, as: 'brand' },
           { model: Type, as: 'type' },
+          {
+            model: DeviceImg,
+            as: 'deviceimg',
+          },
         ],
       });
       return res.json(device);

@@ -26,6 +26,12 @@ const Basket = sequelize.define('basket', {
   userId: { type: DataTypes.INTEGER, unique: true },
 });
 
+const DeviceImg = sequelize.define('deviceimg', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING, allowNull: false },
+  img: { type: DataTypes.ARRAY(DataTypes.STRING), allowNull: false },
+});
+
 const BasketDevice = sequelize.define('basketDevice', {
   quantity: { type: DataTypes.INTEGER, defaultValue: 1 },
 });
@@ -41,7 +47,6 @@ const FavoriteDevice = sequelize.define('favoriteDevice', {
 const Device = sequelize.define('device', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING, allowNull: false, unique: true },
-  img: { type: DataTypes.STRING, allowNull: false },
   price: { type: DataTypes.STRING, allowNull: false },
 });
 
@@ -101,6 +106,9 @@ FavoriteDevice.belongsTo(Device);
 Type.hasMany(Device);
 Device.belongsTo(Type);
 
+DeviceImg.hasMany(Device);
+Device.belongsTo(DeviceImg);
+
 Brand.hasMany(Device);
 Device.belongsTo(Brand);
 
@@ -121,6 +129,7 @@ Color.belongsToMany(Type, { through: TypeBrand });
 
 module.exports = {
   User,
+  DeviceImg,
   UserFiles,
   Device,
   TypeBrand,

@@ -22,6 +22,15 @@ class ColorControllers {
       return next(APIError.badRequest(error.message));
     }
   }
+  async delete(req, res, next) {
+    try {
+      const { id } = req.pathname;
+      const color = await Color.destroy({ where: { id } });
+      return res.json(color);
+    } catch (error) {
+      return next(APIError.badRequest(error.message));
+    }
+  }
 }
 
 module.exports = new ColorControllers();
